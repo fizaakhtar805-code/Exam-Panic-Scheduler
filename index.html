@@ -1,0 +1,138 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+.kw{font-family:'Nunito',sans-serif;background:#FFD6E8;border-radius:24px;padding:24px;min-height:200px;}
+.kw-title{font-size:26px;font-weight:800;color:#C2185B;text-align:center;margin-bottom:2px;}
+.kw-sub{font-size:13px;color:#E91E8C;text-align:center;margin-bottom:18px;font-weight:600;}
+.stress-card{background:#fff;border-radius:20px;padding:16px 20px;margin-bottom:16px;border:2px solid #F8BBD0;}
+.stress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.stress-label{font-size:13px;font-weight:700;color:#AD1457;}
+.stress-pct{font-size:22px;font-weight:800;color:#C2185B;}
+.bar-track{height:14px;border-radius:99px;background:#FCE4EC;overflow:hidden;}
+.bar-fill{height:100%;border-radius:99px;transition:width .6s ease,background .6s ease;}
+.scream{margin-top:8px;font-size:13px;font-weight:700;min-height:18px;color:#AD1457;}
+.form-wrap{background:#fff;border-radius:20px;padding:16px 20px;margin-bottom:16px;border:2px solid #CE93D8;}
+.form-wrap label{font-size:12px;font-weight:700;color:#7B1FA2;display:block;margin-bottom:4px;}
+.form-wrap input[type=text],
+.form-wrap input[type=date]{width:100%;padding:10px 14px;border-radius:14px;border:2px solid #E1BEE7;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:#4A148C;background:#F3E5F5;outline:none;margin-bottom:10px;}
+.form-wrap input:focus{border-color:#AB47BC;}
+.add-btn{width:100%;padding:12px;border-radius:14px;border:none;background:#E91E8C;color:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.3px;transition:opacity .15s;}
+.add-btn:hover{opacity:.88;}
+.queue-label{font-size:12px;font-weight:800;color:#880E4F;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding-left:4px;}
+.exam-list{display:flex;flex-direction:column;gap:10px;}
+.exam-card{background:#fff;border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:12px;border:2px solid #F8BBD0;transition:border-color .2s;}
+.exam-card.top{border-color:#E91E8C;}
+.rank{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.einfo{flex:1;min-width:0;}
+.ename{font-size:15px;font-weight:800;color:#880E4F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.emeta{font-size:12px;color:#AD1457;margin-top:2px;font-weight:600;}
+.chip{font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;flex-shrink:0;}
+.top-badge{font-size:10px;background:#FCE4EC;color:#C2185B;padding:2px 8px;border-radius:99px;font-weight:800;margin-left:6px;vertical-align:middle;}
+.del-btn{background:none;border:none;cursor:pointer;font-size:16px;color:#F48FB1;padding:4px;border-radius:8px;flex-shrink:0;font-family:'Nunito',sans-serif;}
+.del-btn:hover{color:#E91E8C;}
+.empty{text-align:center;padding:24px;color:#F06292;font-size:14px;font-weight:700;}
+</style>
+
+<div class="kw">
+  <h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Kawaii exam panic scheduler</h2>
+  <div class="kw-title">Exam Panic Scheduler</div>
+  <div class="kw-sub">Add your exams. We'll scream at you in the right order.</div>
+
+  <div class="stress-card">
+    <div class="stress-top">
+      <span class="stress-label">Stress Meter</span>
+      <span class="stress-pct" id="stress-val">0%</span>
+    </div>
+    <div class="bar-track">
+      <div class="bar-fill" id="bar-fill" style="width:0%;background:#F48FB1;"></div>
+    </div>
+    <div class="scream" id="scream-msg">Add some exams to start panicking!</div>
+  </div>
+
+  <div class="form-wrap">
+    <label for="ename">Subject name</label>
+    <input type="text" id="ename" placeholder="e.g. Data Structures" />
+    <label for="edate">Exam date</label>
+    <input type="date" id="edate" />
+    <button class="add-btn" onclick="addExam()">+ Add Exam</button>
+  </div>
+
+  <div class="queue-label">Priority Queue — Study Order</div>
+  <div class="exam-list" id="exam-list">
+    <div class="empty" id="empty-msg">No exams yet! Enjoy the peace while it lasts.</div>
+  </div>
+</div>
+
+<script>
+const exams=[];
+function daysUntil(d){const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return Math.round((x-t)/86400000);}
+function score(d){return d<0?1000:d===0?999:d;}
+function addExam(){
+  const n=document.getElementById('ename').value.trim();
+  const d=document.getElementById('edate').value;
+  if(!n||!d){alert('Please enter both a subject and a date!');return;}
+  exams.push({name:n,date:d,id:Date.now()});
+  document.getElementById('ename').value='';
+  document.getElementById('edate').value='';
+  render();
+}
+function removeExam(id){const i=exams.findIndex(e=>e.id===id);if(i>-1)exams.splice(i,1);render();}
+function chipStyle(days){
+  if(days<0) return{bg:'#FFCDD2',tc:'#B71C1C',label:'Overdue'};
+  if(days===0) return{bg:'#FCE4EC',tc:'#880E4F',label:'TODAY!'};
+  if(days<=2) return{bg:'#FFE0B2',tc:'#E65100',label:'Urgent'};
+  if(days<=5) return{bg:'#FFF9C4',tc:'#F57F17',label:'Soon'};
+  if(days<=10) return{bg:'#E8F5E9',tc:'#1B5E20',label:'Upcoming'};
+  return{bg:'#F3E5F5',tc:'#4A148C',label:'Chill~'};
+}
+function rankStyle(i,days){
+  const p=['#FCE4EC','#F8BBD0','#F48FB1','#F06292','#EC407A'];
+  const tc=['#880E4F','#880E4F','#880E4F','#fff','#fff'];
+  const idx=Math.min(i,p.length-1);
+  return{bg:p[idx],tc:tc[idx]};
+}
+function render(){
+  const sorted=[...exams].sort((a,b)=>score(daysUntil(a.date))-score(daysUntil(b.date)));
+  const list=document.getElementById('exam-list');
+  if(!sorted.length){
+    list.innerHTML='<div class="empty">No exams yet! Enjoy the peace while it lasts.</div>';
+    updateStress(0,[]);return;
+  }
+  list.innerHTML=sorted.map((e,i)=>{
+    const days=daysUntil(e.date);
+    const isTop=i===0;
+    const c=chipStyle(days);
+    const r=rankStyle(i,days);
+    const dl=days<0?'already passed':days===0?'TODAY!':days+' day'+(days===1?'':'s')+' left';
+    return`<div class="exam-card${isTop?' top':''}">
+      <div class="rank" style="background:${r.bg};color:${r.tc}">${i+1}</div>
+      <div class="einfo">
+        <div class="ename">${e.name}${isTop?'<span class="top-badge">Study first!</span>':''}</div>
+        <div class="emeta">${new Date(e.date+'T00:00:00').toDateString()} &nbsp;· &nbsp;${dl}</div>
+      </div>
+      <span class="chip" style="background:${c.bg};color:${c.tc}">${c.label}</span>
+      <button class="del-btn" onclick="removeExam(${e.id})" aria-label="Remove">✕</button>
+    </div>`;
+  }).join('');
+  updateStress(sorted.length,sorted.map(e=>daysUntil(e.date)));
+}
+function updateStress(count,daysArr){
+  let s=0;
+  if(count){
+    const u=daysArr.map(d=>d<0?100:d===0?95:d<=2?85:d<=5?60:d<=10?35:15);
+    s=Math.min(100,Math.round(u.reduce((a,b)=>a+b,0)/u.length+count*3));
+  }
+  document.getElementById('stress-val').textContent=s+'%';
+  const f=document.getElementById('bar-fill');
+  f.style.width=s+'%';
+  f.style.background=s<30?'#F48FB1':s<55?'#FF8A65':s<80?'#E91E8C':'#AD1457';
+  const msgs=[[0,'All clear! Go touch some grass~'],[15,'Pretty chill. Maybe open your notes... once.'],[30,'Starting to feel it. Make a cute study playlist!'],[50,'Okay this is getting real. Put the phone down!'],[65,'SEVERAL EXAMS INCOMING. Why are you reading this?!'],[80,'FULL PANIC MODE. Cancel all plans. Order biryani!'],[95,'COMPLETE MELTDOWN. Hug a pillow and open your book!']];
+  const m=msgs.slice().reverse().find(([t])=>s>=t);
+  const sc=document.getElementById('scream-msg');
+  sc.textContent=m?m[1]:'';
+  sc.style.color=s<30?'#AD1457':s<55?'#BF360C':s<80?'#880E4F':'#B71C1C';
+}
+document.getElementById('edate').min=new Date().toISOString().split('T')[0];
+document.getElementById('ename').addEventListener('keydown',e=>{if(e.key==='Enter')addExam();});
+</script>
