@@ -2,7 +2,7 @@
 
 > *Add your exams. We'll scream at you in the right order.*
 
-A fun web app that uses a **Priority Queue** to sort your exams by urgency and screams at you about what to study first — with a stress meter that goes full panic mode as deadlines approach.
+A fun web app that uses a **Priority Queue** to sort your exams by urgency and screams at you about what to study first - with a stress meter that goes full panic mode as deadlines approach.
 
 ## 🚀 How to Run
 
