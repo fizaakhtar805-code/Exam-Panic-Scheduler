@@ -18,4 +18,4 @@ Exams are sorted using **Priority Queue** logic — closest deadline = highest p
 
 ## 👨‍💻 Author
 
-Made with ☕ and mild exam anxiety by **Fiza Akhtar** — 3rd Semester DSA Project
+Made with ☕ and mild exam anxiety by **Fiza Akhtar** — 3rd Semester DSA Project 😣😣😣😣😣
